@@ -12,3 +12,5 @@ streamlit run app.py
 # quit
 ctrl-c
 ```
+
+link to the website : https://kryptosphere-defi-strategy.streamlit.app/
