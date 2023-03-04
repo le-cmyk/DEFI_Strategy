@@ -63,5 +63,5 @@ def creation_all_returns(all_ways,investisment):
 @st.cache_data
 def creation_sorted_df_retruns(returns):
     df_returns = pd.DataFrame(returns)
-    df_returns = df_returns.sort_values('return', ascending=False)
+    df_returns = df_returns.sort_values('return', ascending=False).reset_index(drop=True)
     return df_returns

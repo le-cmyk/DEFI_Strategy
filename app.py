@@ -28,11 +28,17 @@ df = get_data_from_csv(path)
 
 st.sidebar.header("Please Filter Here:")
 
-#jump_number=st.sidebar.slider("Select the project:",value=[1,4])
+jump_number=st.sidebar.slider("Select the number project visited :",
+                              min_value = 1, 
+                              max_value = 4, 
+                              value = 2)
 
-jump_number=2
-investisment=1000
-visualisation_number=10
+investisment=st.sidebar.slider("Select the investment amount :",
+                               min_value = 1, 
+                               max_value = 10000, 
+                               value = 1000)
+
+
 
 # ---- Filtering ----
 
@@ -65,12 +71,20 @@ st.markdown("##")
 # ----TOP KPI's
 
 st.subheader("Number of possible ways:")
-st.subheader(f" {len(all_ways):,}")
+number_of_all_ways=len(all_ways)
+st.subheader(f" {number_of_all_ways:,}")
 
 
 st.markdown("""---""")
 
-st.write(df_returns.head(1000))
+#---- Number of visualized data
+
+visualisation_number=st.sidebar.slider("Select the investment amount :",
+                                       min_value = 1, 
+                                       max_value = number_of_all_ways, 
+                                       value = 10 )
+
+st.write(df_returns.head(visualisation_number))
 
 # ---- HIDE STREAMLIT STYLE ----
 hide_st_style = """

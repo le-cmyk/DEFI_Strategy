@@ -1,5 +1,5 @@
 
-# Interactive Dashboard with Python – Streamlit
+# Interactive DEFI Strategy with Python – Streamlit
 
 Projet of a DEFI Strategy
 
