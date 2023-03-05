@@ -13,7 +13,7 @@ from streamlit_folium import folium_static
 
 from Functions.Essential_for_ProjectLine import get_data_from_csv
 from Functions.Ways_retruns import creation_projects_line, creation_all_possible_ways ,creation_all_returns,creation_sorted_df_retruns
-
+from Functions.Filtre import get_unique_crypto_values, exclude_crypto
 
 # emojis: https://www.webfx.com/tools/emoji-cheat-sheet/ 
 st.set_page_config(page_title="DEFI Projetc", page_icon=":chart_with_upwards_trend:", layout="wide")
@@ -38,21 +38,33 @@ investisment=st.sidebar.slider("Select the investment amount :",
                                max_value = 10000, 
                                value = 1000)
 
+list_exclude_crypto = st.sidebar.multiselect("Select the Crypto to exclued:",
+                                             options=get_unique_crypto_values(df),
+                                             default=['LINK'])
 
+crypto_to_begin=st.sidebar.selectbox("Select the begining crypto", 
+                 get_unique_crypto_values(df,list_exclude_crypto,1),
+                 disabled=False, 
+                 label_visibility="visible")
+
+crypto_to_finish=st.sidebar.selectbox("Select the last crypto", 
+                 get_unique_crypto_values(df,list_exclude_crypto,2),
+                 disabled=False, 
+                 label_visibility="visible")
 
 # ---- Filtering ----
 
-
+df_selection=exclude_crypto(df, list_exclude_crypto)
 
 #region Creation of the returns dataframe
 
 # ---- Creation of the project lines -----
 
-project_lines = creation_projects_line(df)
+project_lines = creation_projects_line(df_selection)
 
 # ---- Creation Of the list of all possible ways 
 
-all_ways = creation_all_possible_ways(project_lines,jump_number)
+all_ways = creation_all_possible_ways(project_lines,jump_number,crypto_to_begin,crypto_to_finish)
 
 # ---- Creation of a list of dictionnary for all returns
 
@@ -79,7 +91,7 @@ st.markdown("""---""")
 
 #---- Number of visualized data
 
-visualisation_number=st.sidebar.slider("Select the investment amount :",
+visualisation_number=st.sidebar.slider("Select the visualisation number :",
                                        min_value = 1, 
                                        max_value = number_of_all_ways, 
                                        value = 10 )

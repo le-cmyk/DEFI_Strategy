@@ -18,24 +18,26 @@ def creation_projects_line(df):
 
 # ---- Generation of all the possible ways (naive function)
 
-def generate_all_possible_ways(starting_project_line, n, project_lines):
+def generate_all_possible_ways(starting_project_line, n, project_lines,finish_by):
     if n == 0:
         return [(starting_project_line,)]
     else:
         ways = []
         for next_project_line in starting_project_line.next_possible:
-            next_ways = generate_all_possible_ways(next_project_line, n-1, project_lines)
+            next_ways = generate_all_possible_ways(next_project_line, n-1, project_lines,finish_by)
             for way in next_ways:
-                ways.append((starting_project_line,) + way)
+                if finish_by is None or way[-1].Lend==finish_by :
+                    ways.append((starting_project_line,) + way)
         return ways
     
 # ---- Creation Of a list of all possible ways 
 
-def creation_all_possible_ways(project_lines,jump_number):
+def creation_all_possible_ways(project_lines,jump_number,start_by=None,finish_by=None):
     all_ways = []
     for project_line in project_lines:
-        ways = generate_all_possible_ways(project_line, jump_number, project_lines)
-        all_ways.extend(ways)
+        if start_by is None or project_line.Borrow == start_by:
+            ways = generate_all_possible_ways(project_line, jump_number, project_lines,finish_by)
+            all_ways.extend(ways)
     return all_ways
 
 # ---- Creation of a list of dictionnary for all returns
