@@ -42,7 +42,7 @@ def creation_all_possible_ways(project_lines,jump_number,start_by=None,finish_by
 
 # ---- Creation of a list of dictionnary for all returns
 
-def creation_all_returns(all_ways,investisment,duration_year=1):
+def creation_all_returns(all_ways,investisment,duration_year):
     returns = [] # A savoir que la liste returns va contenir tout les returns pour chaque projets
 
     for way in all_ways:
