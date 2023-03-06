@@ -14,7 +14,7 @@ import re
 
 from Functions.Essential_for_ProjectLine import get_data_from_csv
 from Functions.Ways_retruns import creation_projects_line, creation_all_possible_ways ,creation_all_returns,creation_sorted_df_retruns
-from Functions.Filtre import get_unique_crypto_values, exclude_crypto, get_Borrow
+from Functions.Filtre import get_unique_crypto_values, exclude_crypto, get_value
 
 # emojis: https://www.webfx.com/tools/emoji-cheat-sheet/ 
 st.set_page_config(page_title="DEFI Projetc", page_icon=":chart_with_upwards_trend:", layout="wide")
@@ -98,7 +98,8 @@ with c_1:
 with c_2:
     st.subheader("Best way:")
     for element in df_returns.loc[0,'way']:
-        st.write(f"{get_Borrow(element,'Project')} : {get_Borrow(element,'Borrow')} → {get_Borrow(element,'Lend')}")
+        string_value=f"{get_value(element,'Project')} : {get_value(element,'Borrow')} → {get_value(element,'Lend')}"
+        st.write(string_value)
 with c_3:
     st.subheader("Best return:")
     number_of_all_ways=len(all_ways)

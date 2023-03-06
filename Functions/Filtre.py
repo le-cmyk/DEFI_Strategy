@@ -25,7 +25,7 @@ def get_unique_crypto_values(df,exclude_list=[None],borrowed_only=0):
 
 #---- Get a value in a string
 
-def get_Borrow(string,to_find):
+def get_value(string,to_find):
   pattern = f"{to_find}: (\w+)"
   match = re.search(pattern, string)
   if match:
