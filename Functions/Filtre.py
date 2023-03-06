@@ -23,15 +23,7 @@ def get_unique_crypto_values(df,exclude_list=[None],borrowed_only=0):
     # return the difference set as a list
     return [None]+list(diff_set)
 
-#---- Get a value in a string
 
-def get_value(string,to_find):
-  pattern = f"{to_find}: (\w+)"
-  match = re.search(pattern, string)
-  if match:
-    return match.group(1)
-  else:
-    return None
 
 
 

@@ -14,7 +14,7 @@ import re
 
 from Functions.Essential_for_ProjectLine import get_data_from_csv
 from Functions.Ways_retruns import creation_projects_line, creation_all_possible_ways ,creation_all_returns,creation_sorted_df_retruns
-from Functions.Filtre import get_unique_crypto_values, exclude_crypto, get_value
+from Functions.Filtre import get_unique_crypto_values, exclude_crypto
 
 # emojis: https://www.webfx.com/tools/emoji-cheat-sheet/ 
 st.set_page_config(page_title="DEFI Projetc", page_icon=":chart_with_upwards_trend:", layout="wide")
@@ -88,6 +88,16 @@ df_returns = creation_sorted_df_retruns(returns)
 # ---- MAINPAGE ----
 st.title(":bar_chart: Defi Projet")
 st.markdown("##")
+
+#---- Get a value in a string
+
+def get_value(string,to_find):
+  pattern = f"{to_find}: (\w+)"
+  match = re.search(pattern, string)
+  if match:
+    return match.group(1)
+  else:
+    return None
 
 # ----TOP KPI's
 c_1, c_2,c_3 = st.columns(3)
