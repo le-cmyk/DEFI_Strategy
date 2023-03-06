@@ -8,6 +8,7 @@ import plotly.graph_objects as go
 import streamlit as st  # pip install streamlit
 import folium
 from streamlit_folium import folium_static
+import re
 
 #---- Importation of the class and functions
 
