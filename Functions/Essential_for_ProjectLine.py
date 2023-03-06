@@ -10,7 +10,7 @@ class ProjectLine:
         self.next_possible=[]
 
     def __str__(self):
-        return f"Project {self.Project} Borrow:{self.Borrow} Lend: {self.Lend} LTV: {self.LTV} Net APY: {self.Net_APY}"
+        return f"Project: {self.Project} Borrow: {self.Borrow} Lend: {self.Lend} LTV: {self.LTV} Net APY: {self.Net_APY}"
         
     def set_next_possible_way(self, project_lines_groups):
         self.next_possible = project_lines_groups.get(self.Lend, [])    
@@ -20,11 +20,13 @@ class ProjectLine:
         for i, project_line in enumerate(self.next_possible):
             print(i, project_line)
 
-    def calculate_investment_return(self, amount):
-        return amount+(amount * self.Net_APY/100)
+    def calculate_investment_return(self, amount,duration_year):
+        return amount+(amount * self.Net_APY/100 * duration_year)
     
     def remaining_amount(self,amount):
         return amount * self.LTV/100
+    
+
     
 #---- Read a csv
 

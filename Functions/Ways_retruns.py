@@ -42,7 +42,7 @@ def creation_all_possible_ways(project_lines,jump_number,start_by=None,finish_by
 
 # ---- Creation of a list of dictionnary for all returns
 
-def creation_all_returns(all_ways,investisment):
+def creation_all_returns(all_ways,investisment,duration_year=1):
     returns = [] # A savoir que la liste returns va contenir tout les returns pour chaque projets
 
     for way in all_ways:
@@ -51,7 +51,7 @@ def creation_all_returns(all_ways,investisment):
                     'apy': [],
                     'return': 0}
         for project_line in way:
-            way_dict['return'] +=project_line.calculate_investment_return(remaining_amount)
+            way_dict['return'] +=project_line.calculate_investment_return(remaining_amount,duration_year)
             remaining_amount = project_line.remaining_amount(remaining_amount)
             way_dict['way'].append(project_line.__str__())
             way_dict['apy'].append(project_line.Net_APY)

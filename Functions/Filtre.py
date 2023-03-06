@@ -1,4 +1,5 @@
 
+import re
 #---- Way to exclude some value from a dataframe
 
 def exclude_crypto(df, list_crypto):
@@ -21,6 +22,16 @@ def get_unique_crypto_values(df,exclude_list=[None],borrowed_only=0):
     diff_set = union_set - set(exclude_list)
     # return the difference set as a list
     return [None]+list(diff_set)
+
+#---- Get a value in a string
+
+def get_Borrow(string,to_find):
+  pattern = f"{to_find}: (\w+)"
+  match = re.search(pattern, string)
+  if match:
+    return match.group(1)
+  else:
+    return None
 
 
 
