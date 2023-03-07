@@ -1,5 +1,6 @@
 import pandas as pd
 import streamlit as st
+import json
 
 from Functions.Essential_for_ProjectLine import ProjectLine, group_by_borrow
 
@@ -42,28 +43,26 @@ def creation_all_possible_ways(project_lines,jump_number,start_by=None,finish_by
 
 # ---- Creation of a list of dictionnary for all returns
 
-def creation_all_returns(all_ways,investisment,duration_year):
+def json_return(all_ways,investisment,duration_year):
     returns = [] # A savoir que la liste returns va contenir tout les returns pour chaque projets
 
     for way in all_ways:
         remaining_amount = investisment
         way_dict = {'way': [],
-                    'apy': [],
                     'return': 0}
         for project_line in way:
             way_dict['return'] +=project_line.calculate_investment_return(remaining_amount,duration_year)
             remaining_amount = project_line.remaining_amount(remaining_amount)
-            way_dict['way'].append(project_line.__str__())
-            way_dict['apy'].append(project_line.Net_APY)
+            dictionnnary_project=project_line.__dict__.copy()
+            if 'next_possible' in dictionnnary_project.keys():
+                del dictionnnary_project['next_possible']
+            way_dict['way'].append(dictionnnary_project)
 
         returns.append(way_dict)
-
-    return returns
-
-# ---- Creation of the sorted dafataframe tanks to the list of dictionnary
+    res={"ways" : returns}
+    return res
 
 @st.cache_data
-def creation_sorted_df_retruns(returns):
-    df_returns = pd.DataFrame(returns)
-    df_returns = df_returns.sort_values('return', ascending=False).reset_index(drop=True)
-    return df_returns
+def creation_sorted_json(json_result,n):
+    json_result["ways"]=sorted(json_result["ways"], key=lambda x: x['return'], reverse=True)[:n]
+    return json_result

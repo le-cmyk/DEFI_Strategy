@@ -13,11 +13,11 @@ import re
 #---- Importation of the class and functions
 
 from Functions.Essential_for_ProjectLine import get_data_from_csv
-from Functions.Ways_retruns import creation_projects_line, creation_all_possible_ways ,creation_all_returns,creation_sorted_df_retruns
+from Functions.Ways_retruns import creation_projects_line, creation_all_possible_ways ,json_return ,creation_sorted_json
 from Functions.Filtre import get_unique_crypto_values, exclude_crypto
 
 # emojis: https://www.webfx.com/tools/emoji-cheat-sheet/ 
-st.set_page_config(page_title="DEFI Projetc", page_icon=":chart_with_upwards_trend:", layout="wide")
+st.set_page_config(page_title="DEFI Project", page_icon=":chart_with_upwards_trend:", layout="wide")
 
 # ---- READ CSV ----
 
@@ -59,6 +59,7 @@ crypto_to_finish=st.sidebar.selectbox("Select the last crypto",
                                     get_unique_crypto_values(df,list_exclude_crypto,2),
                                     disabled=False, 
                                     label_visibility="visible")
+
 #endregion
 
 # ---- Filtering ----
@@ -77,11 +78,22 @@ all_ways = creation_all_possible_ways(project_lines,jump_number,crypto_to_begin,
 
 # ---- Creation of a list of dictionnary for all returns
 
-returns = creation_all_returns(all_ways,investisment,selected_duration)
+Json_Return=json_return(all_ways,investisment,selected_duration)
 
-# ---- Creation of the dataframe for all returns
+# ---- Creation of the Json for all returns
 
-df_returns = creation_sorted_df_retruns(returns)
+
+
+number_of_all_ways=len(all_ways)
+
+visualisation_number=st.sidebar.slider("Select the visualisation number :",
+                                       min_value = 1, 
+                                       max_value = number_of_all_ways, 
+                                       value = 10 )
+
+
+
+Json_Return_sorted=creation_sorted_json(Json_Return,visualisation_number)
 
 #endregion
 
@@ -103,29 +115,82 @@ def get_value(string,to_find):
 c_1, c_2,c_3 = st.columns(3)
 with c_1:
     st.subheader("Number of possible ways:")
-    number_of_all_ways=len(all_ways)
     st.subheader(f" {number_of_all_ways:,}")
 with c_2:
     st.subheader("Best way:")
-    for element in df_returns.loc[0,'way']:
-        string_value=f"{get_value(element,'Project')} : {get_value(element,'Borrow')} → {get_value(element,'Lend')}"
+    best_element=Json_Return_sorted["ways"][0]
+
+    for element in best_element["way"]:
+        string_value=f"{element['Project']} : {element['Borrow']} → {element['Lend']}"
         st.write(string_value)
 with c_3:
     st.subheader("Best return:")
-    number_of_all_ways=len(all_ways)
-    st.subheader(f" {round(df_returns.loc[0,'return'],2):,}")
-
-
+    st.subheader(f" {round(best_element['return'],2):,}")
 
 st.markdown("""---""")
+
+
+def differents_returns(json_file,investisment):
+    returns = []
+    ways = []
+    labels, labels2= [],[]
+    investisment_pourcentage=[]
+    for i in range(len(json_file["ways"])):
+        returns.append(json_file["ways"][i]["return"])
+        ways.append(str(i+1))
+        labels.append(f"Best way n°{i+1}")
+        investisment_pourcentage.append(json_file["ways"][i]["return"]/investisment)
+        labels2.append(f'Best way n°{i+1} : {round(json_file["ways"][i]["return"]/investisment,4)}')
+    
+    fig = go.Figure(
+        data=go.Bar(
+            x=ways,
+            y=investisment_pourcentage,
+            text='',#labels,
+            name="Pourcentage of return",
+            hovertemplate=labels2,
+            marker=dict(color="paleturquoise"),
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=ways,
+            y=returns,
+            yaxis="y2",
+            mode='lines+markers', 
+            text=labels,
+            name="Evolution of the differents return",
+            marker=dict(color="crimson"),
+        )
+    )
+
+    fig.update_layout(
+       title='Evolution of Return', 
+        xaxis_title='Way Index',
+        legend=dict(x=0.42, y=0.98),
+        showlegend=True,
+        yaxis=dict(
+            title=dict(text="Pourcentage of return"),
+            side="right",
+            range=[min(investisment_pourcentage)*0.9995, max(investisment_pourcentage)],
+        ),
+        yaxis2=dict(
+            title=dict(text="Returns"),
+            side="left",
+            range=[round(min(returns))-1, round(max(returns))+1],
+            overlaying="y",
+            tickmode="sync",
+        ),
+    )
+    return fig
+
+st.write(differents_returns(Json_Return_sorted,investisment))
+
 #---- Number of visualized data
 
-visualisation_number=st.sidebar.slider("Select the visualisation number :",
-                                       min_value = 1, 
-                                       max_value = number_of_all_ways, 
-                                       value = 10 )
+st.write(Json_Return_sorted)
 
-st.write(df_returns.head(visualisation_number))
 
 #---- Link and Sources
 
