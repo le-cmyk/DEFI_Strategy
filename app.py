@@ -3,6 +3,7 @@
 
 
 
+import bisect
 import plotly.express as px  # pip install plotly-express
 import plotly.graph_objects as go
 import streamlit as st  # pip install streamlit
@@ -28,6 +29,24 @@ df = get_data_from_csv(path)
 # ---- SIDEBAR ----
 
 #region SIDEBAR
+
+#For exponnential options in the sidebar
+def create_options(n, min, max, value):
+  result = []
+  # Calculate the base of the exponential function
+  base = (max / min) ** (1 / (n - 1))
+  for i in range(n):
+    result.append(round(min * base ** i))
+  
+  # Check if the value is in the result list
+  if value not in result:
+    # Find the closest index to insert the value
+    index = bisect.bisect_left(result, value)
+    # Insert the value at that index
+    result.insert(index, value)
+  
+  return result
+
 st.sidebar.header("Please Filter Here:")
 
 jump_number=st.sidebar.slider("Select the number project visited :",
@@ -86,10 +105,12 @@ Json_Return=json_return(all_ways,investisment,selected_duration)
 
 number_of_all_ways=len(all_ways)
 
-visualisation_number=st.sidebar.slider("Select the visualisation number :",
-                                       min_value = 1, 
-                                       max_value = number_of_all_ways, 
-                                       value = 10 )
+# Display a select slider with the options
+
+options=create_options(70, 1, number_of_all_ways,10)
+visualisation_number = st.sidebar.select_slider('Select the visualisation number :', 
+                                                options=options,
+                                                value=10)
 
 
 
@@ -149,7 +170,7 @@ def differents_returns(json_file,investisment):
             text='',#labels,
             name="Pourcentage of return",
             hovertemplate=labels2,
-            marker=dict(color="paleturquoise"),
+            marker=dict(color="rgb(105,105,105)", line=dict(color="rgb(0,0,0)", width=1)),
         )
     )
 
@@ -161,7 +182,7 @@ def differents_returns(json_file,investisment):
             mode='lines+markers', 
             text=labels,
             name="Evolution of the differents return",
-            marker=dict(color="crimson"),
+            marker=dict(color="rgb(255,69,0)", line=dict(color="rgb(0,0,0)", width=1)),
         )
     )
 
@@ -185,11 +206,17 @@ def differents_returns(json_file,investisment):
     )
     return fig
 
-st.write(differents_returns(Json_Return_sorted,investisment))
 
-#---- Number of visualized data
 
-st.write(Json_Return_sorted)
+tab1, tab2 = st.tabs(["📈 Chart", "🗃 Data"])
+
+tab1.write(differents_returns(Json_Return_sorted,investisment))
+
+tab2.write(Json_Return_sorted)
+
+#---- test
+
+
 
 
 #---- Link and Sources
