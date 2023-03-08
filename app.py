@@ -2,20 +2,17 @@
 # to have the correct version  : pipreqs --encoding=utf8 --force
 
 
-
-import bisect
-import plotly.express as px  # pip install plotly-express
-import plotly.graph_objects as go
 import streamlit as st  # pip install streamlit
-import folium
-from streamlit_folium import folium_static
-import re
+import bisect
+import json
+
 
 #---- Importation of the class and functions
 
 from Functions.Essential_for_ProjectLine import get_data_from_csv
 from Functions.Ways_retruns import creation_projects_line, creation_all_possible_ways ,json_return ,creation_sorted_json
 from Functions.Filtre import get_unique_crypto_values, exclude_crypto
+from Functions.plots import differents_returns
 
 # emojis: https://www.webfx.com/tools/emoji-cheat-sheet/ 
 st.set_page_config(page_title="DEFI Project", page_icon=":chart_with_upwards_trend:", layout="wide")
@@ -81,6 +78,7 @@ crypto_to_finish=st.sidebar.selectbox("Select the last crypto",
 
 #endregion
 
+
 # ---- Filtering ----
 
 df_selection=exclude_crypto(df, list_exclude_crypto)
@@ -122,15 +120,6 @@ Json_Return_sorted=creation_sorted_json(Json_Return,visualisation_number)
 st.title(":bar_chart: Defi Projet")
 st.markdown("##")
 
-#---- Get a value in a string
-
-def get_value(string,to_find):
-  pattern = f"{to_find}: (\w+)"
-  match = re.search(pattern, string)
-  if match:
-    return match.group(1)
-  else:
-    return None
 
 # ----TOP KPI's
 c_1, c_2,c_3 = st.columns(3)
@@ -151,68 +140,30 @@ with c_3:
 st.markdown("""---""")
 
 
-def differents_returns(json_file,investisment):
-    returns = []
-    ways = []
-    labels, labels2= [],[]
-    investisment_pourcentage=[]
-    for i in range(len(json_file["ways"])):
-        returns.append(json_file["ways"][i]["return"])
-        ways.append(str(i+1))
-        labels.append(f"Best way n°{i+1}")
-        investisment_pourcentage.append(json_file["ways"][i]["return"]/investisment)
-        labels2.append(f'Best way n°{i+1} : {round(json_file["ways"][i]["return"]/investisment,4)}')
-    
-    fig = go.Figure(
-        data=go.Bar(
-            x=ways,
-            y=investisment_pourcentage,
-            text='',#labels,
-            name="Pourcentage of return",
-            hovertemplate=labels2,
-            marker=dict(color="rgb(105,105,105)", line=dict(color="rgb(0,0,0)", width=1)),
-        )
-    )
-
-    fig.add_trace(
-        go.Scatter(
-            x=ways,
-            y=returns,
-            yaxis="y2",
-            mode='lines+markers', 
-            text=labels,
-            name="Evolution of the differents return",
-            marker=dict(color="rgb(255,69,0)", line=dict(color="rgb(0,0,0)", width=1)),
-        )
-    )
-
-    fig.update_layout(
-       title='Evolution of Return', 
-        xaxis_title='Way Index',
-        legend=dict(x=0.42, y=0.98),
-        showlegend=True,
-        yaxis=dict(
-            title=dict(text="Pourcentage of return"),
-            side="right",
-            range=[min(investisment_pourcentage)*0.9995, max(investisment_pourcentage)],
-        ),
-        yaxis2=dict(
-            title=dict(text="Returns"),
-            side="left",
-            range=[round(min(returns))-1, round(max(returns))+1],
-            overlaying="y",
-            tickmode="sync",
-        ),
-    )
-    return fig
-
+#----- Visualisations and DATA
 
 
 tab1, tab2 = st.tabs(["📈 Chart", "🗃 Data"])
 
+#---- Plot different return
+
 tab1.write(differents_returns(Json_Return_sorted,investisment))
 
+#---- Enable to download the data
+
+tab2.download_button(
+    label="Download data as JSON",
+    data=json.dumps(Json_Return_sorted),
+    file_name='land_borrow.json',
+    mime='text/json',
+)
+
+#---- Visualisation of the data brut
+
 tab2.write(Json_Return_sorted)
+
+
+
 
 #---- test
 
